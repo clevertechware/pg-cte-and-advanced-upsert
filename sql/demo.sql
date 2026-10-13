@@ -81,6 +81,18 @@ INSERT INTO products VALUES
     (3, 'ecran', 150.00, true);
 
 \echo
+\echo '=== Snapshot partagé : b ne voit pas la ligne insérée par a (id = 4, n = 3 attendus) ==='
+BEGIN;
+WITH a AS (
+    INSERT INTO products VALUES (4, 'tapis', 8.00, false)
+    RETURNING id
+), b AS (
+    SELECT count(*) AS n FROM products
+)
+SELECT a.id, b.n FROM a, b;
+ROLLBACK;
+
+\echo
 \echo '=== Snapshot partagé, variante 1 : SELECT FROM products (anciens prix attendus) ==='
 BEGIN;
 WITH t AS (
